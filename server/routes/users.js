@@ -13,20 +13,9 @@ router.route('/add').post((req,res) => {
    newUser.save().catch(err => res.status(400).json(`Error: ${err}`)).then(() => res.json('User added successfully'));
 });
 
-router.route('/:username').delete( (req,res) => {
-    const user = {username: req.params.username};
-    const {error} = validateUsername(user);
-    if(error){
-        res.status(400).send(error.details[0].message);
-    }
-    else{
-        User.deleteOne(user, (err,result) => {
-            if(err) res.send(`Error: ${err}`);
-            else res.send(result);
-        })
-    }
-
-})
+router.route('/:id').delete((req,res) => {
+    Exercise.findByIdAndDelete(req.params.id).catch(err => res.status(400).json(`Error: ${err}`)).then(() => res.json('User deleted'));
+});
 
 function validateUsername(username){
     const schema = Joi.object({
