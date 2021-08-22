@@ -3,32 +3,44 @@ import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
-export default class CreateExercise extends Component {
+export default class EditOffer extends Component {
     constructor(props) {
         super(props);
 
         this.onChangeUsername = this.onChangeUsername.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
-        this.onChangeDuration = this.onChangeDuration.bind(this);
+        this.onChangePrice = this.onChangePrice.bind(this);
         this.onChangeDate = this.onChangeDate.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            username: '',
+            sellerUsername: '',
             description: '',
-            duration: 0,
+            price: 0,
             date: new Date(),
-            users: []
+            sellerUsernames: []
         }
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5000/users/')
+        axios.get('http://localhost:5000/offers/'+this.props.match.params.id)
+            .then(response => {
+                this.setState({
+                    sellerUsername: response.data.sellerUsername,
+                    description: response.data.description,
+                    price: response.data.price,
+                    date: new Date(response.data.date)
+                })
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+
+        axios.get('http://localhost:5000/sellers/')
             .then(response => {
                 if (response.data.length > 0) {
                     this.setState({
-                        users: response.data.map(user => user.username),
-                        username: response.data[0].username
+                        sellerUsernames: response.data.map(user => user.username),
                     })
                 }
             })
@@ -40,7 +52,7 @@ export default class CreateExercise extends Component {
 
     onChangeUsername(e) {
         this.setState({
-            username: e.target.value
+            sellerUsername: e.target.value
         })
     }
 
@@ -50,9 +62,9 @@ export default class CreateExercise extends Component {
         })
     }
 
-    onChangeDuration(e) {
+    onChangePrice(e) {
         this.setState({
-            duration: e.target.value
+            price: e.target.value
         })
     }
 
@@ -65,16 +77,16 @@ export default class CreateExercise extends Component {
     onSubmit(e) {
         e.preventDefault();
 
-        const exercise = {
-            username: this.state.username,
+        const offer = {
+            sellerUsername: this.state.sellerUsername,
             description: this.state.description,
-            duration: this.state.duration,
+            price: this.state.price,
             date: this.state.date
         }
 
-        console.log(exercise);
+        console.log(offer);
 
-        axios.post('http://localhost:5000/exercises/add', exercise)
+        axios.post('http://localhost:5000/offers/update/' + this.props.match.params.id, offer)
             .then(res => console.log(res.data));
 
         window.location = '/';
@@ -83,20 +95,20 @@ export default class CreateExercise extends Component {
     render() {
         return (
             <div>
-                <h3>Create New Exercise Log</h3>
+                <h3>Edit Offer</h3>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
                         <label>Username: </label>
                         <select ref="userInput"
                                 required
                                 className="form-control"
-                                value={this.state.username}
+                                value={this.state.sellerUsername}
                                 onChange={this.onChangeUsername}>
                             {
-                                this.state.users.map(function(user) {
+                                this.state.sellerUsernames.map(function(sellerUsername) {
                                     return <option
-                                        key={user}
-                                        value={user}>{user}
+                                        key={sellerUsername}
+                                        value={sellerUsername}>{sellerUsername}
                                     </option>;
                                 })
                             }
@@ -112,12 +124,12 @@ export default class CreateExercise extends Component {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Duration (in minutes): </label>
+                        <label>Price (in dollars): </label>
                         <input
                             type="text"
                             className="form-control"
-                            value={this.state.duration}
-                            onChange={this.onChangeDuration}
+                            value={this.state.price}
+                            onChange={this.onChangePrice}
                         />
                     </div>
                     <div className="form-group">
@@ -131,7 +143,7 @@ export default class CreateExercise extends Component {
                     </div>
 
                     <div className="form-group">
-                        <input type="submit" value="Create Exercise Log" className="btn btn-primary" />
+                        <input type="submit" value="Edit Offer" className="btn btn-primary" />
                     </div>
                 </form>
             </div>
