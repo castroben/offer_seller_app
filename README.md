@@ -1,5 +1,5 @@
 # Offer-Seller App
-Simple application built using Node.js, Express.js, REACT and MongoDB.
+Simple web application built using Node.js, Express.js, REACT and MongoDB.
 
 This application is not currently hosted and cannot be access through WWW. To run this application, install node.js and follow the steps below.
 
